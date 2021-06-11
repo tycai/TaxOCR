@@ -21,6 +21,7 @@ using Microsoft.Win32;
 using System.Net.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 namespace TaxOCR
 {
@@ -60,7 +61,6 @@ namespace TaxOCR
 
         }
         /*
-        {"words_result":{"AmountInWords":"鑲嗘嬀澹瑰渾浼嶈鏁?,"InvoiceNumConfirm":"67540627","CommodityPrice":[{"row":"1","word":"39.150943"}],"NoteDrawer":"鏈卞埄浜?,"SellerAddress":"娣卞湷甯傚崡灞卞尯鍗楀北琛楅亾鍗楁捣澶ч亾2163鍙稡1灞?0鍙?20-89115275","CommodityNum":[{"row":"1","word":"1.000000"}],"SellerRegisterNum":"91440300MA5EJRPEXF","MachineCode":"499099395431","Remarks":"鍏卞寘鍚?寮犺鍗?2021051518320413732666930170)搴楅攢鍚嶇О:(閬囪灏忛潰(鍗撴偊涓簵x","SellerBank":"鎷涘晢閾惰娣卞湷鍗楁捣鏀755934464510801","CommodityTaxRate":[{"row":"1","word":"6%"}],"TotalTax":"2.35","InvoiceCodeConfirm":"044032000211","CheckCode":"06410964817168957186","InvoiceCode":"044032000211","InvoiceDate":"2021骞?5鏈?5鏃?,"PurchaserRegisterNum":"91440300758208403Q","InvoiceTypeOrg":"娣卞湷澧炲€肩◣鐢靛瓙鏅€氬彂绁?,"Password":"0378198>8334+986//395438>7<*9>+9/6068/>2<*7-7<4592+<<1/4>2902<-69-130983996+534/<67>740935400901/76>1991123752*+","Agent":"鍚?,"AmountInFiguers":"41.50","PurchaserBank":"","Checker":"闄堝崰婊?,"City":"","TotalAmount":"39.15","CommodityAmount":[{"row":"1","word":"39.15"}],"PurchaserName":"娣卞湷甯傚箍鐩堜赴鎶曡祫鏈夐檺鍏徃","CommodityType":[],"Province":"","InvoiceType":"鐢靛瓙鏅€氬彂绁?,"SheetNum":"","PurchaserAddress":"","CommodityTax":[{"row":"1","word":"2.35"}],"CommodityUnit":[],"Payee":"寮犵惁","CommodityName":[{"row":"1","word":"* 椁愰ギ鏈嶅姟* 椁愯垂"}],"SellerName":"娣卞湷閬囪灏忛潰椁愰ギ绠＄悊鏈夐檺鍏徃","InvoiceNum":"67540627"},"log_id":1403287363114762240,"words_result_num":38}
         */
         // 增值税发票识别
         public static string VatInvoice(string loc)
@@ -71,14 +71,20 @@ namespace TaxOCR
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(host);
             request.Method = "post";
             request.KeepAlive = true;
+
+            // 文件类别
+            string ftype = loc.Substring(loc.LastIndexOf(".") + 1);
+
             // 图片的base64编码
             string base64 = GetFileBase64(loc);
-            String str = "image=" + HttpUtility.UrlEncode(base64);
+            string base64pdf = Regex.Replace(base64, @"^data:application/[a-zA-Z]+;base64,", "");
+
+            string str = "image=" + HttpUtility.UrlEncode(base64);
             byte[] buffer = encoding.GetBytes(str);
             request.ContentLength = buffer.Length;
             request.GetRequestStream().Write(buffer, 0, buffer.Length);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.Default);
+            StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
             string result = reader.ReadToEnd();
             Console.WriteLine("增值税发票识别:");
             Console.WriteLine(result);
@@ -93,8 +99,15 @@ namespace TaxOCR
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(host);
             request.Method = "post";
             request.KeepAlive = true;
+
+            // 文件类别
+            string ftype = loc.Substring(loc.LastIndexOf(".")+1);
+
             // 图片的base64编码
             string base64 = GetFileBase64(loc);
+            string base64pdf = Regex.Replace(base64, @"^data:application/[a-zA-Z]+;base64,", "");
+
+
             String str = "image=" + HttpUtility.UrlEncode(base64);
             byte[] buffer = encoding.GetBytes(str);
             request.ContentLength = buffer.Length;
@@ -142,8 +155,18 @@ namespace TaxOCR
                 //String result = GetAccessToken();
                 //JObject jo = (JObject)JsonConvert.DeserializeObject(result);
                 //TOKEN = jo["access_token"].ToString();
-                tbk.Text = QuotaInvoice(url_tb.Text);
+                //tbk.Text = QuotaInvoice(url_tb.Text);
                 // tbk.Text = VatInvoice(url_tb.Text);
+
+                // 增值税发票：
+                string result = VatInvoice(url_tb.Text);
+                JObject jo = (JObject)JsonConvert.DeserializeObject(result);
+                string inv_num = jo["words_result"]["InvoiceNum"].ToString();
+                string inv_type = jo["words_result"]["InvoiceType"].ToString();
+                string inv_date = jo["words_result"]["InvoiceDate"].ToString();
+                string purchaser = jo["words_result"]["PurchaserName"].ToString();
+                string comm_name = jo["words_result"]["CommodityName"]["word"].ToString();
+                string amount = jo["words_result"]["AmountInFiguers"].ToString();
             }
             else
             {
