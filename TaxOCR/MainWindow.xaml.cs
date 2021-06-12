@@ -204,6 +204,7 @@ namespace TaxOCR
         {
             InvoiceType = "测试";
             InvoiceNum = "3343";
+            InvoiceDate = "2021年6月12日";
         }
         public string InvoiceType { get; set; }
         public string InvoiceNum { get; set; }
