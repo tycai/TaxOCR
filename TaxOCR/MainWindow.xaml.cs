@@ -159,8 +159,22 @@ namespace TaxOCR
                 // tbk.Text = VatInvoice(url_tb.Text);
 
                 // 增值税发票：
-                string result = VatInvoice(url_tb.Text);
-                JObject jo = (JObject)JsonConvert.DeserializeObject(result);
+                // string result = VatInvoice(url_tb.Text);
+                Invoice inv = new Invoice();
+                List<Invoice> InvList = new List<Invoice>();
+                // JObject jo = (JObject)JsonConvert.DeserializeObject(result);
+                // inv.InvoiceNum = jo["words_result"]["InvoiceNum"].ToString();
+                // inv.InvoiceType = jo["words_result"]["InvoiceType"].ToString();
+                // inv.InvoiceDate = jo["words_result"]["InvoiceDate"].ToString();
+                // inv.PurchaserName = jo["words_result"]["PurchaserName"].ToString();
+                // inv.SellerName = jo["words_result"]["SellerName"].ToString();
+                // inv.CommodityName = jo["words_result"]["CommodityName"];
+                // inv.AmountInWords = jo["words_result"]["AmountInWords"].ToString();
+                // inv.AmountInFiguers = (double)jo["words_result"]["AmountInFiguers"];
+                InvList.Add(inv);
+                
+                InvGrid.ItemsSource = InvList;
+                /*
                 string inv_num = jo["words_result"]["InvoiceNum"].ToString();
                 string inv_type = jo["words_result"]["InvoiceType"].ToString();
                 string inv_date = jo["words_result"]["InvoiceDate"].ToString();
@@ -168,6 +182,7 @@ namespace TaxOCR
                 string seller = jo["words_result"]["SellerName"].ToString(); 
                 string comm_name = jo["words_result"]["CommodityName"]["word"].ToString();
                 string amount = jo["words_result"]["AmountInFiguers"].ToString();
+                */
             }
             else
             {
@@ -185,6 +200,11 @@ namespace TaxOCR
     }
     public class Invoice
     {
+        public Invoice()
+        {
+            InvoiceType = "测试";
+            InvoiceNum = "3343";
+        }
         public string InvoiceType { get; set; }
         public string InvoiceNum { get; set; }
         public string InvoiceDate { get; set; }

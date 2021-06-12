@@ -11,12 +11,11 @@
         <TextBlock x:Name="tbk" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Bottom" Margin="319,0,0,329.5" Height="83" Width="399"/>
         <TextBox x:Name="url_tb" HorizontalAlignment="Left" Height="42" Margin="10,10,0,0" TextWrapping="Wrap" Text="本地文件路径" VerticalAlignment="Top" Width="201"/>
         <Button Content="识别发票" HorizontalAlignment="Left" Margin="217,74,0,0" VerticalAlignment="Top" Width="75" Click="Rec_Clicked"/>
-        <DataGrid HorizontalAlignment="Left" Height="229" VerticalAlignment="Top" Width="696" Margin="22,122,0,0">
+        <DataGrid x:Name="InvGrid" HorizontalAlignment="Left" Height="229" VerticalAlignment="Top" Width="696" Margin="22,122,0,0" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="序号"/>
-                <DataGridCheckBoxColumn/>
-                <DataGridComboBoxColumn Header="combobox"/>
-                <DataGridTemplateColumn/>
+                <DataGridTextColumn Header="发票类型" Binding="{Binding InvoiceType}"/>
+
             </DataGrid.Columns>
         </DataGrid>
 
