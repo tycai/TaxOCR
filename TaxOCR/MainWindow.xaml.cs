@@ -99,7 +99,7 @@ namespace TaxOCR
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(host);
             request.Method = "post";
             request.KeepAlive = true;
-
+            
             // 文件类别
             string ftype = loc.Substring(loc.LastIndexOf(".")+1);
 
@@ -165,6 +165,7 @@ namespace TaxOCR
                 string inv_type = jo["words_result"]["InvoiceType"].ToString();
                 string inv_date = jo["words_result"]["InvoiceDate"].ToString();
                 string purchaser = jo["words_result"]["PurchaserName"].ToString();
+                string seller = jo["words_result"]["SellerName"].ToString(); 
                 string comm_name = jo["words_result"]["CommodityName"]["word"].ToString();
                 string amount = jo["words_result"]["AmountInFiguers"].ToString();
             }
@@ -181,6 +182,17 @@ namespace TaxOCR
             }
 
         }
+    }
+    public class Invoice
+    {
+        public string InvoiceType { get; set; }
+        public string InvoiceNum { get; set; }
+        public string InvoiceDate { get; set; }
+        public string PurchaserName { get; set; }
+        public string[] CommodityName { get; set; }
+        public string SellerName { get; set; }
+        public string AmountInWords { get; set; }
+        public double AmountInFiguers { get; set; }
     }
 }
 
